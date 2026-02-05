@@ -1,314 +1,619 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
-
+<!doctype html>
+<html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>慢性阻塞肺病評估量表 CAT</title>
+  <meta charset="utf-8" />
+  <title>N14 肺功能練習紀錄</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --main-blue: #0066cc;
-            --bg-color: #f8f9fb;
-            --base-font-size: 20px;
-        }
+  <!-- Chart.js + Luxon adapter -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/luxon@3.5.0/build/global/luxon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.1/dist/chartjs-adapter-luxon.umd.min.js"></script>
 
-        body {
-            background-color: var(--bg-color);
-            font-family: "Microsoft JhengHei", sans-serif;
-            font-size: var(--base-font-size);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        h4 {
-            font-size: 30px !important;
-            font-weight: 800 !important;
-            color: #333;
-        }
-
-        h5 {
-            font-size: 26px !important;
-            font-weight: bold;
-            color: var(--main-blue);
-        }
-
-        .visitor-counter {
-            position: fixed;
-            top: 12px;
-            right: 12px;
-            z-index: 1050;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 6px 15px;
-            border-radius: 20px;
-            font-size: 16px;
-            backdrop-filter: blur(4px);
-        }
-
-        .card {
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-            padding: 25px !important;
-        }
-
-        .question-item {
-            display: none;
-        }
-
-        .question-item.active {
-            display: block;
-            animation: fadeInRight 0.4s ease-out;
-        }
-
-        .form-control {
-            font-size: 22px !important;
-            padding: 15px !important;
-            border-radius: 12px;
-        }
-
-        .btn-primary {
-            font-size: 22px !important;
-            padding: 12px 25px !important;
-            border-radius: 12px;
-            font-weight: bold;
-        }
-
-        /* --- 核心調整：垂直問卷格式 --- */
-        .survey-box {
-            border: 2px solid #e0e6ed;
-            border-radius: 15px;
-            padding: 20px;
-            background-color: #ffffff;
-            margin-top: 15px;
-        }
-
-        .side-text {
-            font-size: 24px !important;
-            /* 這裡控制文字大小 */
-            font-weight: 900 !important;
-            /* 這裡設定最粗體 */
-            padding: 15px 0;
-            /* 稍微增加一點上下間距，視覺更舒服 */
-            display: block;
-            text-align: center;
-            line-height: 1.3;
-        }
-
-        .btn-group-vertical {
-            width: 100%;
-        }
-
-        .btn-score {
-            width: 100%;
-            /* 寬度撐滿 */
-            height: 60px;
-            margin: 4px 0 !important;
-            border: 2px solid var(--main-blue) !important;
-            background: #fff;
-            color: var(--main-blue);
-            font-size: 26px !important;
-            font-weight: 900;
-            border-radius: 12px !important;
-            /* 方圓角設計更有整體感 */
-            transition: 0.2s;
-        }
-
-        .btn-score:active,
-        .btn-score:hover {
-            background: var(--main-blue) !important;
-            color: white !important;
-        }
-
-        /* --------------------------- */
-
-        .progress {
-            height: 12px;
-            border-radius: 10px;
-            background-color: #e9ecef;
-        }
-
-        .display-1 {
-            font-size: 6rem !important;
-            font-weight: 800;
-        }
-
-        .advice-text {
-            font-size: 20px !important;
-            color: #444;
-        }
-
-        @keyframes fadeInRight {
-            from {
-                opacity: 0;
-                transform: translateX(30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-    </style>
+  <style>
+    :root{
+      --bg:#f6f8ff;
+      --card:#ffffff;
+      --line:#d6defa;
+      --text:#10203a;
+      --muted:#51607a;
+      --accent:#2f6bff;
+      --accentSoft:#eaf1ff;
+      --danger:#ff4d5f;
+      --dangerSoft:#ffe9ec;
+      --radius:18px;
+    }
+    body{
+      margin:0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Arial;
+      font-size: 20px;
+    }
+    .wrap{
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 18px 14px 28px;
+    }
+    h1{
+      font-size: 30px;
+      margin: 10px 4px 6px;
+      letter-spacing: .2px;
+    }
+    .sub{
+      margin: 0 4px 16px;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 16px;
+    }
+    .card{
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin: 12px 0;
+      box-shadow: 0 10px 24px rgba(16,32,58,.06);
+    }
+    label{
+      display:block;
+      color: var(--muted);
+      font-size: 16px;
+      margin: 6px 2px;
+    }
+    input{
+      width: 100%;
+      box-sizing: border-box;
+      padding: 16px 14px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: #fff;
+      font-size: 24px;
+      outline: none;
+    }
+    input:focus{
+      border-color: rgba(47,107,255,.6);
+      box-shadow: 0 0 0 5px rgba(47,107,255,.12);
+    }
+    .row{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items: stretch;
+    }
+    .col{ flex:1; min-width: 180px; }
+    button{
+      width: 100%;
+      padding: 16px 14px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: var(--accentSoft);
+      color: var(--text);
+      font-size: 24px;
+      font-weight: 780;
+      cursor: pointer;
+      user-select:none;
+    }
+    button.primary{
+      background: var(--accent);
+      border-color: var(--accent);
+      color:#fff;
+    }
+    button:disabled{
+      opacity: .55;
+      cursor: not-allowed;
+    }
+    .seg{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .seg button{
+      width: auto;
+      flex: 1;
+      min-width: 160px;
+    }
+    .pill{
+      margin-top: 10px;
+      display:inline-block;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background:#fff;
+      color: var(--muted);
+      font-size: 16px;
+    }
+    .error{
+      margin-top: 10px;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,77,95,.45);
+      background: var(--dangerSoft);
+      color: #8b0f1c;
+      font-size: 16px;
+      display:none;
+      white-space: pre-wrap;
+    }
+    canvas{
+      width:100% !important;
+      height: 380px !important;
+      margin-top: 10px;
+    }
+    .stats{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top: 10px;
+    }
+    .stat{
+      flex:1;
+      min-width: 160px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background:#fff;
+    }
+    .stat .k{ color: var(--muted); font-size: 16px; }
+    .stat .v{ font-size: 24px; font-weight: 860; margin-top: 2px; }
+    @media (max-width:520px){
+      h1{ font-size: 28px; }
+      button, input{ font-size: 22px; }
+      .seg button{ min-width: 0; }
+    }
+  </style>
 </head>
 
 <body>
-
-    <div class="visitor-counter">瀏覽人次: <span id="vCount">0</span></div>
-
-    <div class="container py-4" style="max-width: 500px;">
-        <h4 class="text-center mb-4">慢性阻塞肺病評估量表 CAT</h4>
-
-        <div id="loginSection" class="card mb-4 text-center">
-            <label class="form-label fw-bold text-secondary mb-3">輸入病歷號(查找/記錄用)</label>
-            <div class="d-grid gap-3">
-                <input type="text" id="patientID" class="form-control text-center" placeholder="例如: No.12345">
-                <button class="btn btn-primary w-100" id="btnStart">開始評估 / 查詢</button>
-            </div>
+  <div class="wrap">
+    <h1>肺功能練習紀錄</h1>
+    <div class="sub">
+      請輸入病例號後開始記錄。
+    </div>
+    
+    <div class="card">
+      <label>病例號</label>
+      <div class="row">
+        <div class="col">
+          <input id="caseId" placeholder="例如 12345 / N14-0001" autocomplete="off" />
         </div>
-
-        <div id="quizSection" style="display: none;">
-            <div class="progress mb-4">
-                <div id="pBar" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%"></div>
-            </div>
-            <div id="questionContainer"></div>
+        <div class="col" style="min-width:240px;">
+          <button class="primary" id="loginBtn">進入 / 載入</button>
         </div>
-
-        <div id="resultSection" style="display: none;">
-            <div class="card text-center mb-4">
-                <h5 class="text-muted mb-1">本次評估總分</h5>
-                <div class="display-1 text-primary my-2" id="scoreDisplay">--</div>
-                <div id="levelTag" class="badge rounded-pill fs-5 py-3 px-4 mb-4"></div>
-                <div class="text-start bg-light p-4 rounded advice-text" id="adviceBox"></div>
-                <button class="btn btn-outline-secondary w-100 mt-4" onclick="location.reload()">重新檢測</button>
-            </div>
-
-            <div class="card shadow-sm">
-                <h5 class="fw-bold mb-3">變化趨勢 (最近10次)</h5>
-                <canvas id="historyChart"></canvas>
-                <p class="text-center text-muted mt-3" style="font-size: 16px;">※ 曲線上升代表症狀加重</p>
-            </div>
-        </div>
+      </div>
+      <div class="pill" id="statusPill">狀態：未登入</div>
+      <div class="error" id="errorBox"></div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
-        import { getDatabase, ref, set, push, onValue, runTransaction, get, query, limitToLast }
-            from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
+    <div class="card">
+      <label>輸入練習數值（自動記時間）</label>
+      <div class="row">
+        <div class="col">
+          <input id="value" type="number" step="0.01" inputmode="decimal" placeholder="例如 2100" />
+        </div>
+        <div class="col" style="min-width:240px;">
+          <button class="primary" id="addBtn" disabled>新增紀錄</button>
+        </div>
+      </div>
+      <div class="pill">提示：新增後會立刻更新圖表</div>
+    </div>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDw4h1MJjReMQ7WoRVrBhxR7eqwKypQTwA",
-            authDomain: "copdn14.firebaseapp.com",
-            projectId: "copdn14",
-            storageBucket: "copdn14.firebasestorage.app",
-            messagingSenderId: "374148356521",
-            appId: "1:374148356521:web:3ec298e5e069e864518cb8",
-            databaseURL: "https://copdn14-default-rtdb.firebaseio.com"
-        };
+    <div class="card">
+      <label>查看範圍（手動）</label>
+      <div class="seg">
+        <button id="range1h" disabled>最近 1 小時</button>
+        <button id="range24h" class="primary" disabled>最近 24 小時</button>
+        <button id="range3d" disabled>最近 3 天</button>
+      </div>
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+      <div style="margin-top:12px;">
+        <label>選擇某一天（看昨天/前天）</label>
+        <div class="row">
+          <div class="col">
+            <input id="dayPicker" type="date" disabled />
+          </div>
+          <div class="col" style="min-width:240px;">
+            <button id="viewDayBtn" disabled>查看這一天</button>
+          </div>
+        </div>
+      </div>
 
-        const questions = [
-            { t: "咳嗽狀況", l: "我從不咳嗽", r: "我一直在咳嗽" },
-            { t: "胸腔痰液", l: "我一點痰都沒有", r: "我有非常多痰" },
-            { t: "胸悶感覺", l: "一點也沒有胸悶", r: "胸悶感覺很嚴重" },
-            { t: "爬坡/爬樓梯", l: "不感覺喘不過氣", r: "感覺非常喘不過氣" },
-            { t: "居家活動", l: "不受限制", r: "受到很大限制" },
-            { t: "信心狀況", l: "有信心外出", r: "完全沒信心外出" },
-            { t: "睡眠品質", l: "睡得安穩", r: "睡得不安穩" },
-            { t: "活力狀況", l: "活力旺盛", r: "一點活力都沒有" }
-        ];
+      <div class="pill" id="rangePill">目前顯示：等待登入</div>
+    </div>
 
-        let currentIdx = 0;
-        let userScores = [];
-        let chartInstance = null;
+    <div class="card">
+      <canvas id="chart"></canvas>
 
-        const vRef = ref(db, 'visitorCount');
-        runTransaction(vRef, (curr) => (curr || 0) + 1);
-        onValue(vRef, (snap) => document.getElementById('vCount').innerText = snap.val());
+      <div class="stats">
+        <div class="stat">
+          <div class="k">病例號</div>
+          <div class="v" id="statCase">—</div>
+        </div>
+        <div class="stat">
+          <div class="k">筆數</div>
+          <div class="v" id="statCount">0</div>
+        </div>
+        <div class="stat">
+          <div class="k">最新值</div>
+          <div class="v" id="statLatest">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-        document.getElementById('btnStart').onclick = async () => {
-            const id = document.getElementById('patientID').value.trim();
-            if (!id) return alert("請輸入病歷號碼");
-            const userRef = ref(db, `records/${id}`);
-            const snap = await get(userRef);
-            if (!snap.exists()) alert("✨ 帳號開通成功！已建立新檔案。");
-            document.getElementById('loginSection').style.display = 'none';
-            document.getElementById('quizSection').style.display = 'block';
-            renderQuestion();
-        };
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+  import {
+    getFirestore, collection, addDoc, getDocs,
+    query, orderBy, where, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-        // --- 修改後的渲染函數 (垂直結構) ---
-        function renderQuestion() {
-            const q = questions[currentIdx];
-            const html = `
-            <div class="question-item active">
-                <div class="card">
-                    <h5 class="text-center mb-2">第 ${currentIdx + 1} 題</h5>
-                    <div class="survey-box">
-                        <span class="side-text text-primary">${q.l}</span>
-                        <div class="btn-group-vertical">
-                            ${[0, 1, 2, 3, 4, 5].map(v => `<button class="btn btn-score" data-val="${v}">${v}</button>`).join('')}
-                        </div>
-                        <span class="side-text text-danger">${q.r}</span>
-                    </div>
-                </div>
-            </div>
-        `;
-            document.getElementById('questionContainer').innerHTML = html;
-            document.getElementById('pBar').style.width = `${((currentIdx + 1) / 8) * 100}%`;
+  const firebaseConfig = {
+    apiKey: "AIzaSyCtc-isjXQGrfpg-dZuZnYYqKRcdVFdirg",
+    authDomain: "n14lungfunction.firebaseapp.com",
+    projectId: "n14lungfunction",
+    storageBucket: "n14lungfunction.firebasestorage.app",
+    messagingSenderId: "458356989888",
+    appId: "1:458356989888:web:e5a6f598671b2056667225",
+    measurementId: "G-S30N1SSS81"
+  };
 
-            document.querySelectorAll('.btn-score').forEach(btn => {
-                btn.onclick = () => {
-                    userScores.push(parseInt(btn.dataset.val));
-                    if (currentIdx < questions.length - 1) {
-                        currentIdx++;
-                        renderQuestion();
-                    } else {
-                        finishQuiz();
-                    }
-                };
-            });
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const $ = (id) => document.getElementById(id);
+
+  let currentCaseId = null;
+  let chart = null;
+
+  // ✅ 預設：最近 24 小時
+  let viewMode = { type:"range", ms: 24*60*60*1000, label:"最近 24 小時", activeBtnId:"range24h" };
+
+  function showError(msg){
+    const box = $("errorBox");
+    if(!msg){
+      box.style.display = "none";
+      box.textContent = "";
+      return;
+    }
+    box.style.display = "block";
+    box.textContent = msg;
+  }
+  function setStatus(text){ $("statusPill").textContent = "狀態：" + text; }
+  function setRangeText(text){ $("rangePill").textContent = "目前顯示：" + text; }
+
+  function normalizeCaseId(s){ return (s || "").trim(); }
+  function recordCollectionRef(){ return collection(db, "users", currentCaseId, "records"); }
+
+  function setEnabledAfterLogin(enabled){
+    $("addBtn").disabled = !enabled;
+    $("range1h").disabled = !enabled;
+    $("range24h").disabled = !enabled;
+    $("range3d").disabled = !enabled;
+    $("dayPicker").disabled = !enabled;
+    $("viewDayBtn").disabled = !enabled;
+  }
+
+  function setActiveRangeButton(activeId){
+    for(const id of ["range1h","range24h","range3d"]){
+      $(id).classList.toggle("primary", id === activeId);
+    }
+  }
+
+  function cleanNumber(v){
+    if(typeof v === "string"){
+      const s = v.replace(/,/g, "").trim();
+      return Number(s);
+    }
+    return Number(v);
+  }
+
+  function cleanPoints(points){
+    return (points || [])
+      .map(p => ({
+        x: (p?.x instanceof Date) ? p.x : new Date(p?.x),
+        y: cleanNumber(p?.y)
+      }))
+      .filter(p => p.x instanceof Date && !isNaN(p.x.getTime()) && Number.isFinite(p.y))
+      .sort((a,b) => a.x - b.x);
+  }
+
+  function startOfDayLocal(ymd){
+    const [y,m,d] = ymd.split("-").map(Number);
+    return new Date(y, m-1, d, 0, 0, 0, 0);
+  }
+  function endOfDayLocal(ymd){
+    const [y,m,d] = ymd.split("-").map(Number);
+    return new Date(y, m-1, d, 23, 59, 59, 999);
+  }
+
+  async function ensureAuth(){
+    await signInAnonymously(auth);
+  }
+
+  // ✅ 刻度自動：依視圖決定 unit
+  function getTimeUnitForView(){
+    if(viewMode.type === "range"){
+      if(viewMode.ms <= 60*60*1000) return "minute";           // 1h
+      if(viewMode.ms <= 24*60*60*1000) return "hour";          // 24h
+      return "day";                                            // 3d → 天（更乾淨）
+    }
+    return "hour";                                             // 指定日期 → 小時
+  }
+
+  function getTimeDisplayFormats(unit){
+    if(unit === "minute") return { minute: "HH:mm" };
+    if(unit === "hour")   return { hour: "MM/dd HH" };
+    if(unit === "day")    return { day: "MM/dd" };
+    return {};
+  }
+
+  function clampDate(d, min, max){
+    const t = d.getTime();
+    return new Date(Math.min(Math.max(t, min.getTime()), max.getTime()));
+  }
+
+  // ✅ 視覺友善 X 軸：資料靠左不擠右，但仍不超出所選範圍
+  function getXAxisRangeForPoints(clean){
+    // 指定日期：固定整天，仍一致
+    if(viewMode.type === "day"){
+      const xmin = startOfDayLocal(viewMode.ymd);
+      const xmax = endOfDayLocal(viewMode.ymd);
+      return { xmin, xmax };
+    }
+
+    // range mode 的完整邊界
+    const fullMax = new Date(); // 現在
+    const fullMin = new Date(Date.now() - viewMode.ms);
+
+    if(!clean || clean.length === 0){
+      return { xmin: fullMin, xmax: fullMax };
+    }
+
+    // 資料最早/最晚
+    const dataMin = clean[0].x;
+    const dataMax = clean[clean.length - 1].x;
+
+    const span = Math.max(1, dataMax.getTime() - dataMin.getTime());
+
+    // padding：15% 的跨度，最少 10 分鐘，最多 3 小時
+    // （讓資料不要貼邊，但也不會放太空）
+    const pad = Math.min(
+      3 * 60 * 60 * 1000,
+      Math.max(10 * 60 * 1000, span * 0.15)
+    );
+
+    let xmin = new Date(dataMin.getTime() - pad);
+    let xmax = new Date(dataMax.getTime() + pad);
+
+    // 不可超出完整範圍（保持一致性）
+    xmin = clampDate(xmin, fullMin, fullMax);
+    xmax = clampDate(xmax, fullMin, fullMax);
+
+    // 若 clamp 後範圍太小，回退完整範圍
+    if(xmin.getTime() >= xmax.getTime()){
+      return { xmin: fullMin, xmax: fullMax };
+    }
+
+    return { xmin, xmax };
+  }
+
+  function getUnitZh(unit){
+    if(unit === "minute") return "分鐘";
+    if(unit === "hour") return "小時";
+    if(unit === "day") return "天";
+    return "時間";
+  }
+
+  async function loadAndRender(){
+    if(!currentCaseId) return;
+
+    showError("");
+    setStatus("載入中…");
+
+    try{
+      let raw = [];
+
+      if(viewMode.type === "day"){
+        const start = startOfDayLocal(viewMode.ymd);
+        const end = endOfDayLocal(viewMode.ymd);
+
+        const qDay = query(
+          recordCollectionRef(),
+          where("ts", ">=", start),
+          where("ts", "<=", end),
+          orderBy("ts", "asc")
+        );
+
+        const snap = await getDocs(qDay);
+        snap.forEach(doc => {
+          const d = doc.data();
+          if(d.ts) raw.push({ x: d.ts.toDate(), y: d.value });
+        });
+
+        const clean = cleanPoints(raw);
+        render(clean);
+
+        const unit = getTimeUnitForView();
+        setRangeText(`指定日期：${viewMode.ymd}（刻度：${getUnitZh(unit)}）`);
+        setStatus(`已載入 ${clean.length} 筆`);
+        return;
+      }
+
+      // range mode
+      const start = new Date(Date.now() - viewMode.ms);
+
+      const qRange = query(
+        recordCollectionRef(),
+        where("ts", ">=", start),
+        orderBy("ts", "asc")
+      );
+
+      const snap = await getDocs(qRange);
+      snap.forEach(doc => {
+        const d = doc.data();
+        if(d.ts) raw.push({ x: d.ts.toDate(), y: d.value });
+      });
+
+      const clean = cleanPoints(raw);
+      render(clean);
+
+      const unit = getTimeUnitForView();
+      setRangeText(`${viewMode.label}（刻度：${getUnitZh(unit)}）`);
+      setStatus(`已載入 ${clean.length} 筆`);
+    } catch(err){
+      console.error(err);
+      setStatus("發生錯誤");
+      showError(String(err?.message || err));
+    }
+  }
+
+  async function login(){
+    const cid = normalizeCaseId($("caseId").value);
+    if(!cid) return alert("請輸入病例號");
+
+    currentCaseId = cid;
+    $("statCase").textContent = currentCaseId;
+
+    showError("");
+    setStatus("登入中…");
+
+    try{
+      await ensureAuth();
+      setEnabledAfterLogin(true);
+
+      // dayPicker 預設今天
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth()+1).padStart(2,"0");
+      const d = String(now.getDate()).padStart(2,"0");
+      $("dayPicker").value = `${y}-${m}-${d}`;
+
+      // ✅ 一開始固定 24h
+      viewMode = { type:"range", ms: 24*60*60*1000, label:"最近 24 小時", activeBtnId:"range24h" };
+      setActiveRangeButton("range24h");
+      await loadAndRender();
+
+      setStatus("登入成功");
+    } catch(err){
+      console.error(err);
+      setEnabledAfterLogin(false);
+      setStatus("登入失敗");
+      showError(String(err?.message || err));
+    }
+  }
+
+  async function addRecord(){
+    if(!currentCaseId) return alert("請先登入");
+
+    const raw = $("value").value;
+    const v = cleanNumber(raw);
+    if(raw === "" || !Number.isFinite(v)) return alert("請輸入有效數值");
+
+    showError("");
+    setStatus("寫入中…");
+
+    try{
+      await addDoc(recordCollectionRef(), { value: v, ts: serverTimestamp() });
+      $("value").value = "";
+      await loadAndRender();
+      setStatus("已新增並更新圖表");
+    } catch(err){
+      console.error(err);
+      setStatus("新增失敗");
+      showError(String(err?.message || err));
+    }
+  }
+
+  function render(points){
+    const clean = cleanPoints(points);
+
+    $("statCase").textContent = currentCaseId ?? "—";
+    $("statCount").textContent = String(clean.length);
+    $("statLatest").textContent = clean.length ? String(clean[clean.length - 1].y) : "—";
+
+    const ctx = $("chart");
+    if(chart) chart.destroy();
+
+    const unit = getTimeUnitForView();
+    const formats = getTimeDisplayFormats(unit);
+
+    // ✅ 視覺友善的 X 軸範圍
+    const { xmin, xmax } = getXAxisRangeForPoints(clean);
+
+    chart = new Chart(ctx, {
+      type: "line",
+      data: {
+        datasets: [{
+          label: "數值變化",
+          data: clean,
+          borderWidth: 4,
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          tension: 0.2,
+          spanGaps: true
+        }]
+      },
+      options: {
+        parsing: false,
+        animation: false,
+        scales: {
+          x: {
+            type: "time",
+            min: xmin,
+            max: xmax,
+            time: { unit, displayFormats: formats },
+            ticks: {
+              maxRotation: 0,
+              autoSkip: true,
+              maxTicksLimit: 8
+            }
+          },
+          y: { beginAtZero: false }
         }
+      }
+    });
+  }
 
-        async function finishQuiz() {
-            const id = document.getElementById('patientID').value.trim();
-            const total = userScores.reduce((a, b) => a + b, 0);
-            const now = new Date();
-            const timeStr = `${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
-            await push(ref(db, `records/${id}`), { score: total, date: timeStr, timestamp: Date.now() });
-            showResults(total, id);
-        }
+  async function setRange(ms, label, btnId){
+    viewMode = { type:"range", ms, label, activeBtnId: btnId };
+    setActiveRangeButton(btnId);
+    await loadAndRender();
+  }
 
-        async function showResults(total, id) {
-            document.getElementById('quizSection').style.display = 'none';
-            document.getElementById('resultSection').style.display = 'block';
-            document.getElementById('scoreDisplay').innerText = total;
-            const box = document.getElementById('adviceBox');
-            const tag = document.getElementById('levelTag');
-            if (total > 30) { tag.innerText = "非常高影響"; tag.className = "badge rounded-pill fs-5 py-3 px-4 mb-4 bg-danger"; box.innerHTML = "<strong>臨床影響：</strong>日常生活極大受限。<br><strong>建議：</strong>盡快諮詢醫師。"; }
-            else if (total > 20) { tag.innerText = "高影響"; tag.className = "badge rounded-pill fs-5 py-3 px-4 mb-4 bg-warning text-dark"; box.innerHTML = "<strong>臨床影響：</strong>大部分想做的事無法完成。<br><strong>建議：</strong>諮詢醫師調整藥物。"; }
-            else if (total >= 10) { tag.innerText = "中等影響"; tag.className = "badge rounded-pill fs-5 py-3 px-4 mb-4 bg-info text-dark"; box.innerHTML = "<strong>臨床影響：</strong>對日常生活造成困擾。<br><strong>建議：</strong>戒菸並依照醫囑治療。"; }
-            else { tag.innerText = "低影響"; tag.className = "badge rounded-pill fs-5 py-3 px-4 mb-4 bg-success"; box.innerHTML = "<strong>臨床影響：</strong>生活小問題。<br><strong>建議：</strong>戒菸、打疫苗、追蹤。"; }
+  // ✅ 事件委派：範圍按鈕一定有反應
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest("button");
+    if(!btn) return;
 
-            const historyQuery = query(ref(db, `records/${id}`), limitToLast(10));
-            onValue(historyQuery, (snap) => {
-                const labels = []; const data = [];
-                snap.forEach(child => { labels.push(child.val().date); data.push(child.val().score); });
-                if (chartInstance) chartInstance.destroy();
-                const ctx = document.getElementById('historyChart').getContext('2d');
-                chartInstance = new Chart(ctx, {
-                    type: 'line',
-                    data: { labels: labels, datasets: [{ label: 'CAT 總分', data: data, borderColor: '#0066cc', backgroundColor: 'rgba(0, 102, 204, 0.1)', fill: true, tension: 0.3, pointRadius: 6 }] },
-                    options: { responsive: true, aspectRatio: 1.2, scales: { y: { min: 0, max: 40 } }, plugins: { legend: { display: false } } }
-                });
-            });
-        }
-    </script>
+    if(btn.id === "loginBtn") { login(); return; }
+    if(btn.id === "addBtn") { addRecord(); return; }
+
+    if(!currentCaseId) {
+      if(["range1h","range24h","range3d","viewDayBtn"].includes(btn.id)){
+        alert("請先輸入病例號並進入");
+      }
+      return;
+    }
+
+    if(btn.id === "range1h")  setRange(60*60*1000, "最近 1 小時", "range1h");
+    if(btn.id === "range24h") setRange(24*60*60*1000, "最近 24 小時", "range24h");
+    if(btn.id === "range3d")  setRange(3*24*60*60*1000, "最近 3 天", "range3d");
+
+    if(btn.id === "viewDayBtn"){
+      const ymd = $("dayPicker").value;
+      if(!ymd) return alert("請選日期");
+      viewMode = { type:"day", ymd, label:`指定日期：${ymd}` };
+      setActiveRangeButton("");
+      loadAndRender();
+    }
+  });
+
+  // 初始狀態
+  setEnabledAfterLogin(false);
+  setRangeText("等待登入");
+  render([]);
+
+</script>
 </body>
-
 </html>
